@@ -1,5 +1,5 @@
-# PatientManagementSystem
-# Setting up database
+<h1> Patient Management System </h1>
+This system is designed to help healthcare providers manage patient information, including medical history, appointments, and prescription records. The following instructions will guide you through setting up the system's database.
 
 # Medicine
 CREATE TABLE IF NOT EXISTS public."Patient"
