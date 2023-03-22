@@ -1,7 +1,9 @@
 <h1> Patient Management System </h1>
 This system is designed to help healthcare providers manage patient information, including medical history, appointments, and prescription records. The following instructions will guide you through setting up the system's database.
 
-# Medicine
+<h2> Setting up database </h2>
+
+<h3> Medicine </h3>
 CREATE TABLE IF NOT EXISTS public."Patient"
 (
     "patient_ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
