@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='/add_allergy.css') }}"/>
+    <title>Add Allergy</title>
+  </head>
+  <body>
+    <h1>
+      Add Allergy for {{ patient_name }}
+    </h1>
+    <form method="post" action="{{ url_for('add_allergy', patient_ID=patient_ID) }}">
+      <label for="allergen_name">Allergen:</label>
+      <select name="allergen_name" id="allergen_name">
+        {% for allergen in allergens %}
+        <option value="{{ allergen }}">{{ allergen }}</option>
+        {% endfor %}
+      </select>
+      <br><br>
+      <input type="submit" value="Add Allergy">
+    </form>
+  </body>
+    <a href="/">
+      Back to homepage
+    </a>
+    <a href="/view_patient">
+      Back to list of patient
+    </a>
+</html>

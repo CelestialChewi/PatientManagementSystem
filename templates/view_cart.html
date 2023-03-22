@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>View Cart</title>
+  </head>
+  <body>
+    <h1>View Cart</h1>
+    <p>Patient's Name: {{ patient_name }}</p>
+    <p>Patient's ID: {{patient_ID}}</p>
+    {% if cart_items %}
+      <table>
+        <thead>
+          <tr>
+            <th>Medicine Name</th>
+            <th>Quantity</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart_items %}
+            <tr>
+              <td>{{ item[4] }}</td>
+              <td>{{ item[3] }}</td>
+              <td>
+                <form method="POST">
+                  <input type="hidden" name="Cart_ID" value="{{ item[0] }}">
+                  <button type="submit" name="remove">Remove</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <form method="POST" action="{{ url_for('submit_cart', patient_ID=patient_ID) }}">
+        <button type="submit" name="submit">Submit Cart</button>
+      </form>
+    {% else %}
+      <p>Your cart is empty.</p>
+    {% endif %}
+  </body>
+</html>

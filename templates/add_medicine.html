@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Medicine</title>
+</head>
+<body>
+    <h1>Add Medicine</h1>
+    <form method="post">
+        <label for="medicine_name">Medicine Name:</label>
+        <input type="text" id="medicine_name" name="medicine_name" required>
+        <br>
+        <label for="allergen_name">Allergen:</label>
+        <select id="allergen_name" name="allergen_name" required>
+            {% for allergen in allergens %}
+            <option value="{{ allergen }}">{{ allergen }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <button type="submit">Add Medicine</button>
+    </form>
+</body>
+</html>

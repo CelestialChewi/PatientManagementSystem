@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='/edit_patient.css') }}"/>
+    <title>Edit Patient's Details</title>
+</head>
+<body>
+    <h1>        
+        Edit Patient's Details
+    </h1>
+    <form method="POST">
+        <label for="patient_name">Patient Name:</label>
+        <input type="text" id="patient_name" name="patient_name" value="{{ patient[1] }}"><br>
+        <label for="patient_IC">IC Number:</label>
+        <input type="text" id="patient_IC" name="patient_IC" value="{{ patient[3] }}"><br>
+        <label for="patient_passport">Passport Number:</label>
+        <input type="text" id="patient_passport" name="patient_passport" value="{{ patient[4] }}"><br>
+        <label for="patient_DOB">Date of Birth:</label>
+        <input type="date" id="patient_DOB" name="patient_DOB" value="{{ patient[2] }}"><br>
+        <input type="submit" value="Update">
+    </form>
+
+    <a href="/">
+        Back to homepage
+    </a>
+
+</body>
+</html>

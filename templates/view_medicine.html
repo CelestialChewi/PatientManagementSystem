@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='/view_medicine.css') }}"/>
+    <title>View Medicine</title>
+</head>
+<body>
+    <h1>View Medicine</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Medicine Name</th>
+                <th>Allergen Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for medicine in medicine_list %}
+            <tr>
+                <td>{{ medicine[4] }}</td>
+                <td>{{ medicine[3] }}
+                    <a href="/edit_medicine/{{medicine[0]}}">
+                        <i class="fa fa-pencil" style="font-size:30px;color:red"></i>
+                    <!-- </a> later add order_medicine link here -->
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="/">
+        Back to homepage
+    </a>
+</body>
+</html>

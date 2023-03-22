@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Medicine</title>
+</head>
+<body>
+    <h1>Edit Medicine</h1>
+
+    <form method="POST">
+        <label for="medicine_name">Medicine Name:</label>
+        <input type="text" id="medicine_name" name="medicine_name" value="{{ medicine[1] }}" required><br><br>
+
+        <label for="allergen_name">Allergen:</label>
+        <select id="allergen_name" name="allergen_name">
+            {% for allergen in allergens %}
+            <option value="{{ allergen }}" {% if allergen == medicine[2] %}selected{% endif %}>{{ allergen }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <input type="submit" value="Save Changes">
+    </form>
+</body>
+</html>
