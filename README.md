@@ -4,6 +4,7 @@ This system is designed to help healthcare providers manage patient information,
 <h2> Setting up database </h2>
 
 <h3> Medicine </h3>
+```
 CREATE TABLE IF NOT EXISTS public."Patient"
 (
     "patient_ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
@@ -18,8 +19,9 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public."Patient"
     OWNER to postgres;
+```
 
-# PatientAllergies
+<h3> PatientAllergies <>
 CREATE TABLE IF NOT EXISTS public."PatientAllergies"
 (
     "ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
