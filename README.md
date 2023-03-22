@@ -21,7 +21,8 @@ ALTER TABLE IF EXISTS public."Patient"
     OWNER to postgres;
 ```
 
-<h3> PatientAllergies <>
+<h3> PatientAllergies </h3>
+```
 CREATE TABLE IF NOT EXISTS public."PatientAllergies"
 (
     "ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
@@ -50,6 +51,7 @@ COMMENT ON CONSTRAINT "allergen_ID" ON public."PatientAllergies"
     IS 'Get allergen_ID from Allergens.table and insert into PatientAllergies.table';
 COMMENT ON CONSTRAINT "patient_ID" ON public."PatientAllergies"
     IS 'Get patient_ID from Patient.table and insert into PatientAllergies.table';
+```
 
 # Allergens
 CREATE TABLE IF NOT EXISTS public."Allergens"
