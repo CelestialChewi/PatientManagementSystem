@@ -3,8 +3,8 @@ This system is designed to help healthcare providers manage patient information,
 
 <h2> Setting up database </h2>
 
-<h3> Medicine </h3>
-````
+<p1> Medicine </p1>
+
 ```
 CREATE TABLE IF NOT EXISTS public."Patient"
 (
@@ -20,5 +20,5 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public."Patient"
     OWNER to postgres;
+    
 ```
-````
