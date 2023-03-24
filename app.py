@@ -1,13 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, flash, render_template, request, redirect, url_for
 from datetime import datetime
 import psycopg2
 
 app = Flask(__name__)
-conn = psycopg2.connect(database="",
-                        host="",
-                        user="",
-                        password="",
-                        port="")
+conn = psycopg2.connect(
 
 @app.route('/')
 def home():
@@ -342,25 +338,42 @@ def add_to_cart(patient_ID):
 
         if allergen and allergen in allergies:
             # If the medicine is allergic to the patient, return a warning
-            return "Warning: This medicine is allergic to the patient's existing allergies! Please contact nearest specialist."
+            return f'''
+            Warning: This medicine is allergic to the patient's existing allergies! Please contact nearest specialist.
+            <script>
+                function redirect() {{
+                    document.location.href = '/add_to_cart/{patient_ID}';
+                }}
+                setTimeout(redirect, 5000);
+            </script>
+            '''
+        
+        else:
+            # If the medicine is not allergic to the patient, add it to the view cart
+            cursor = conn.cursor()  # Get the medicine ID based on the medicine name
+            cursor.execute('''                              
+                SELECT "medicine_ID"
+                    FROM public."Medicine"
+                    WHERE "medicine_name" = %s''', (medicine_name,))
+            medicine_ID = cursor.fetchone()[0]
 
-        # If the medicine is not allergic to the patient, add it to the view cart
-        cursor = conn.cursor()  # Get the medicine ID based on the medicine name
-        cursor.execute('''                              
-            SELECT "medicine_ID"
-                FROM public."Medicine"
-                WHERE "medicine_name" = %s''', (medicine_name,))
-        medicine_ID = cursor.fetchone()[0]
+            # Insert the patient ID, medicine ID, and quantity into the view cart
+            cursor.execute('''
+                INSERT INTO public."ViewCart"("patient_ID", "medicine_ID", "quantity")
+                VALUES (%s, %s, %s)''', (patient_ID, medicine_ID, quantity))
+            conn.commit()
+            cursor.close()
 
-        # Insert the patient ID, medicine ID, and quantity into the view cart
-        cursor.execute('''
-            INSERT INTO public."ViewCart"("patient_ID", "medicine_ID", "quantity")
-            VALUES (%s, %s, %s)''', (patient_ID, medicine_ID, quantity))
-        conn.commit()
-        cursor.close()
-
-        # Return a success message
-        return "Medicine added to cart successfully"
+            # Return a success message
+            return f'''
+            Medicine added to cart successfully
+            <script>
+                function redirect() {{
+                    document.location.href = '/add_to_cart/{patient_ID}';
+                }}
+                setTimeout(redirect, 5000);
+            </script>
+            '''
 
     # If the request method is GET, render the template with the form
     cursor = conn.cursor()
@@ -373,36 +386,6 @@ def add_to_cart(patient_ID):
     cursor.close()
 
     return render_template('add_to_cart.html', patient_ID=patient_ID, medicines=medicines, patient_name=patient_name)
-
-@app.route('/view_cart/<patient_ID>', methods=['GET', 'POST'])
-def view_cart(patient_ID):
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT v.*, m."medicine_name"
-            FROM public."ViewCart"v
-            JOIN public."Medicine"m on v."medicine_ID" = m."medicine_ID"
-            WHERE v."patient_ID" = %s''', (patient_ID,))
-    cart_items = cursor.fetchall()
-    cursor.close()
-
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT "patient_name" FROM public."Patient"
-        WHERE "patient_ID" = %s''', (patient_ID,))
-    patient_name = cursor.fetchone()[0]
-    cursor.close()
-
-    if request.method == 'POST':
-        Cart_ID = request.form['Cart_ID']
-        cursor = conn.cursor()
-        cursor.execute('''
-            DELETE FROM public."ViewCart"
-            WHERE "Cart_ID" = %s ''', (Cart_ID))
-        conn.commit()
-        cursor.close()
-        flash('Item has been removed from your cart', 'success')
-
-    return render_template('view_cart.html', patient_ID=patient_ID, patient_name=patient_name, cart_items=cart_items)
 
 @app.route('/submit_cart/<patient_ID>', methods=['GET', 'POST'])
 def submit_cart(patient_ID):
@@ -418,7 +401,15 @@ def submit_cart(patient_ID):
 
     if not cart_items:
         # If the cart is empty, return a message
-        return "Your shopping cart is empty"
+        return '''
+        Your shopping cart is empty!
+        <script>
+            function redirect() {
+                document.location.href = 'add_to_cart/<patient_ID>';
+            }
+            setTimeout(redirect, 5000);
+        </script>
+        '''
 
     # Get the patient's name
     cursor = conn.cursor()
@@ -451,7 +442,52 @@ def submit_cart(patient_ID):
         cursor.close()
 
         # Return a success message
-        return f"Your shopping cart has been submitted successfully for {patient_name}!"
+        return f'''Your shopping cart has been submitted successfully for {patient_name}!
+        <script>
+            function redirect() {{
+                document.location.href = '/view_patient';
+            }}
+            setTimeout(redirect, 5000);
+        </script>'''
+
+@app.route('/view_cart/<patient_ID>', methods=['GET', 'POST'])
+def view_cart(patient_ID):
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT v."patient_ID", v."medicine_ID", SUM (v."quantity"), m."medicine_name"	
+            FROM public."ViewCart"v
+            JOIN public."Medicine"m on v."medicine_ID" = m."medicine_ID"
+            WHERE v."patient_ID" = %s
+            GROUP BY v."patient_ID", v."medicine_ID", m."medicine_name" ''', (patient_ID))
+    cart_items = cursor.fetchall()
+    cursor.close()
+
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT "patient_name" FROM public."Patient"
+        WHERE "patient_ID" = %s''', (patient_ID,))
+    patient_name = cursor.fetchone()[0]
+    cursor.close()
+
+    if request.method == 'POST':
+        medicine_ID = request.form['medicine_ID']
+        cursor = conn.cursor()
+        cursor.execute('''
+            DELETE FROM public."ViewCart"v
+            WHERE "medicine_ID" = %s and "patient_ID" = %s''', (medicine_ID, patient_ID))
+        conn.commit()
+        cursor.close()
+        return f'''
+        Item has been removed from your cart
+        <script>
+            function redirect() {{
+                document.location.href = '/view_cart/{patient_ID}';
+            }}
+            setTimeout(redirect, 5000);
+        </script>
+        '''
+
+    return render_template('view_cart.html', patient_ID=patient_ID, patient_name=patient_name, cart_items=cart_items)
 
 @app.route('/view_transaction_history/<patient_ID>', methods=['GET'])
 def view_transaction_history(patient_ID):
@@ -465,11 +501,12 @@ def view_transaction_history(patient_ID):
 
     cursor = conn.cursor()
     cursor.execute('''
-        SELECT th."order_ID", m."medicine_name", th."quantity", th."purchase_date"
+        SELECT m."medicine_ID", m."medicine_name", SUM(th."quantity"), th."purchase_date"
             FROM public."TransactionHistory"th
             JOIN public."Medicine" m ON th."medicine_ID" = m."medicine_ID"
             WHERE th."patient_ID" = %s
-            ORDER BY th."purchase_date" DESC''', (patient_ID,))
+            GROUP BY m."medicine_ID", th."purchase_date"
+            ORDER BY th."purchase_date" DESC''', (patient_ID))
     transaction_history = cursor.fetchall()
     cursor.close()
 

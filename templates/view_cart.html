@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='/view_cart.css') }}"/>
     <title>View Cart</title>
   </head>
   <body>
@@ -19,11 +22,11 @@
         <tbody>
           {% for item in cart_items %}
             <tr>
-              <td>{{ item[4] }}</td>
               <td>{{ item[3] }}</td>
+              <td>{{ item[2] }}</td>
               <td>
                 <form method="POST">
-                  <input type="hidden" name="Cart_ID" value="{{ item[0] }}">
+                  <input type="hidden" name="medicine_ID" value="{{ item[1] }}">
                   <button type="submit" name="remove">Remove</button>
                 </form>
               </td>
