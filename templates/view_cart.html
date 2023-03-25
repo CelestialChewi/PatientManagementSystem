@@ -4,10 +4,19 @@
     <link
     rel="stylesheet"
     href="{{ url_for('static', filename='/view_cart.css') }}"/>
+    <link 
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
     <title>View Cart</title>
   </head>
   <body>
-    <h1>View Cart</h1>
+    <h1>
+      View Cart
+      <a href="/view_patient">
+        <i class="material-icons" style="font-size:25px">people</i>
+      </a>
+    </h1>
     <p>Patient's Name: {{ patient_name }}</p>
     <p>Patient's ID: {{patient_ID}}</p>
     {% if cart_items %}
@@ -35,8 +44,9 @@
         </tbody>
       </table>
       <form method="POST" action="{{ url_for('submit_cart', patient_ID=patient_ID) }}">
-        <button type="submit" name="submit">Submit Cart</button>
+        <button type="submit" id="submit_button" name="submit">Submit Cart</button>
       </form>
+      <button type="submit" onclick="location.href='/add_to_cart/{{patient_ID}}'">Back to Cart</button>
     {% else %}
       <p>Your cart is empty.</p>
     {% endif %}

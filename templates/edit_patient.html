@@ -4,27 +4,32 @@
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='/edit_patient.css') }}"/>
+    <link 
+        rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Edit Patient's Details</title>
 </head>
 <body>
     <h1>        
         Edit Patient's Details
+        <a href="/">
+            <i class="fa fa-home" style="font-size:30px"></i>
+        </a>
     </h1>
     <form method="POST">
-        <label for="patient_name">Patient Name:</label>
-        <input type="text" id="patient_name" name="patient_name" value="{{ patient[1] }}"><br>
-        <label for="patient_IC">IC Number:</label>
-        <input type="text" id="patient_IC" name="patient_IC" value="{{ patient[3] }}"><br>
-        <label for="patient_passport">Passport Number:</label>
-        <input type="text" id="patient_passport" name="patient_passport" value="{{ patient[4] }}"><br>
-        <label for="patient_DOB">Date of Birth:</label>
-        <input type="date" id="patient_DOB" name="patient_DOB" value="{{ patient[2] }}"><br>
-        <input type="submit" value="Update">
+        <label for="patient_name" id="label_patient_name">Patient Name:</label>
+        <input type="text" id="patient_name" name="patient_name" value="{{ patient[1] }}">
+        <br>
+        <label for="patient_IC" id="label_patient_IC">IC Number:</label>
+        <input type="text" id="patient_IC" name="patient_IC" value="{{ patient[3] }}">
+        <br>
+        <label for="patient_passport" id="label_patient_passport">Passport Number:</label>
+        <input type="text" id="patient_passport" name="patient_passport" value="{{ patient[4] }}">
+        <br>
+        <label for="patient_DOB" id="label_patient_DOB">Date of Birth:</label>
+        <input type="date" id="patient_DOB" name="patient_DOB" value="{{ patient[2] }}">
+        <br>
+        <input type="submit" id="update_button" value="Update">
     </form>
-
-    <a href="/">
-        Back to homepage
-    </a>
-
 </body>
 </html>

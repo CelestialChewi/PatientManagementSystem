@@ -4,10 +4,17 @@
     <link
     rel="stylesheet"
     href="{{ url_for('static', filename='/add_to_cart.css') }}"/>
+    <link 
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
     <title>Add to Cart</title>
   </head>
   <body>
-    <h1>Order Medication for {{ patient_name }}</h1>
+    <h1>Order Medication for {{ patient_name }}
+      <a href="/view_patient">
+        <i class="material-icons" style="font-size:25px">people</i></a>
+    </h1>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <ul class="flashes">
@@ -28,9 +35,9 @@
       <label for="quantity">Quantity:</label>
       <input type="number" name="quantity" id="quantity" value="1" min="1">
       <br>
-      <button type="submit" onclick="location.href='{{ url_for('add_to_cart', patient_ID=patient_ID) }}'">Add to Cart</button>
+      <button type="submit" onclick="location.href='/add_to_cart/{{patient_ID}}'">Add to Cart</button>
       <br>
-      <button type="button" onclick="location.href='{{ url_for('view_cart', patient_ID=patient_ID) }}'">View Shopping Cart</button>
+      <button type="button" onclick="location.href='/view_cart/{{patient_ID}}'">View Shopping Cart</button>
     </form>
   </body>
 </html>

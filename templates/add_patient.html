@@ -4,24 +4,28 @@
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='/add_patient.css') }}"/>
+    <link 
+    rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Add Patient</title>
   </head>
   <body>
-    <h1>Add Patient</h1>
+    <h1>
+      Add Patient
+      <a href="/">
+        <i class="fa fa-home" style="font-size:30px"></i>
+      </a>
+    </h1>
     <form method="POST" action="{{ url_for('add_patient') }}">
-      <!-- <label for="patient_name">Name:</label> -->
       <input type="text" id="patient_name" name="patient_name" placeholder="Name"><br>
 
-      <!-- <label for="patient_IC">IC (without - ):</label> -->
-      <input type="text" id="patient_IC" name="patient_IC" placeholder="IC"><br>
+      <input type="text" id="patient_IC" name="patient_IC" placeholder="IC (without -)"><br>
 
-      <!-- <label for="patient_passport">Passport:</label> -->
       <input type="text" id="patient_passport" name="patient_passport" placeholder="Passport"><br>
 
-      <!-- <label for="patient_DOB">Date of Birth (year-month-day):</label> -->
       <input type="date" id="patient_DOB" name="patient_DOB" placeholder="Date of Birth"><br>
 
-      <input type="submit" value="Add Patient">
+      <input type="submit" id="add_patient" value="Add Patient">
     </form>
   </body>
 </html>

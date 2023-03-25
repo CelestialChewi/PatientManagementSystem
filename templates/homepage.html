@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='/homepage.css') }}"/>
     <title>Homepage</title>
   </head>
   <body>
     <h1>Welcome to the Patient Management System</h1>
-    <a href="/add_patient">Add Patient</a>
+    <button type="button" id="add_patient" onclick="location.href='/add_patient'">Add New Patient</button>
     <br>
-    <a href="/view_patient">View Patient</a>
+    <button type="button" id="view_patient" onclick="location.href='/view_patient'">View Existing Patient</button>
   </body>
 </html>
