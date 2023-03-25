@@ -3,7 +3,11 @@ from datetime import datetime
 import psycopg2
 
 app = Flask(__name__)
-conn = psycopg2.connect(
+conn = psycopg2.connect(database="SA_Assessment",
+                        host="localhost",
+                        user="postgres",
+                        password="chewi1234",
+                        port="5432")
 
 @app.route('/')
 def home():
@@ -30,35 +34,86 @@ def show_add_patient_form():
     return render_template('add_patient.html')
 
 @app.route('/add_patient', methods=['POST']) # Success
-def add_patient(): # Get the patient's information from the form
+def add_patient(): 
+
+    # Get the patient's information from the form
     print(request.form)
     patient_name = request.form['patient_name']
     patient_IC = request.form['patient_IC']
     patient_passport = request.form['patient_passport']
     patient_dob = request.form['patient_DOB']
 
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO public."Patient"("patient_name", "patient_IC", "patient_passport", "patient_DOB") 
-        VALUES (%s, %s, %s, %s)''', (patient_name, patient_IC, patient_passport, patient_dob))
-    conn.commit()
+    if not patient_name.strip() or not patient_IC.strip():
+        return '''
+        Please fill in the form!
+        <script>
+            function redirect() {
+                document.location.href = 'add_patient';
+            }
+            setTimeout(redirect, 3000);
+        </script>
+        '''
+    
+    else:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO public."Patient"("patient_name", "patient_IC", "patient_passport", "patient_DOB") 
+            VALUES (%s, %s, %s, %s)''', (patient_name, patient_IC, patient_passport, patient_dob))
+        conn.commit()
 
-    return "Patient added successfully"
+        return f'''
+        Patient ({patient_name}) added successfully!
+        <script>
+            function redirect() {{
+                document.location.href = 'add_patient';
+            }}
+            setTimeout(redirect, 3000);
+        </script>
+        '''
 
 @app.route('/add_allergy/<patient_ID>', methods=['GET', 'POST'])
 def add_allergy(patient_ID):
+
     if request.method == 'POST':
-        patient_allergy = request.form['allergen_name']
+        allergen_name = request.form['allergen_name']
         
-        # Insert the allergy details into the PatientAllergies table                                # The code has to check the existing allergies before adding it
+        # Check if the patient already has the allergy
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT COUNT(*) 
+	            FROM public."PatientAllergies"pa
+	            JOIN public."Allergens"a ON pa."allergen_ID" = a."allergen_ID"
+	            JOIN public."Patient"p ON pa."patient_ID" = p."patient_ID"
+	            WHERE p."patient_ID" = %s AND a."allergen_name" = %s''', (patient_ID, allergen_name))
+        allergy_count = cursor.fetchone()[0]
+
+        if allergy_count > 0:
+            return f'''The patient already has the allergy ({allergen_name})
+            <script>
+            function redirect() {{
+                document.location.href = '/add_allergy/{patient_ID}';
+            }}
+            setTimeout(redirect, 3000);
+            </script>
+            '''
+        
+        # Insert the allergy details into the PatientAllergies table
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO public."PatientAllergies"("patient_ID", "allergen_ID") 
             VALUES (%s, (SELECT "allergen_ID" FROM public."Allergens" 
-            WHERE "allergen_name" = %s))''', (patient_ID, patient_allergy))
+            WHERE "allergen_name" = %s))''', (patient_ID, allergen_name))
         conn.commit()
 
-        return "Allergy added successfully"
+        return f'''
+        Allergy ({allergen_name}) added successfully
+        <script>
+            function redirect() {{
+                document.location.href = '/add_allergy/{patient_ID}';
+            }}
+            setTimeout(redirect, 3000);
+        </script>
+        '''
 
     else:
         # Get the list of allergens to display in the dropdown menu
@@ -94,7 +149,14 @@ def edit_patient(patient_ID):
 
         conn.commit()
 
-        return "Patient updated successfully"
+        return '''
+        Patient's details updated successfully"
+        <script>
+                function redirect() {
+                    document.location.href ='/view_patient';
+                }
+                setTimeout(redirect, 3000);
+        </script>'''
     
     else: # Display the form to edit the patient's details
         cursor = conn.cursor() 
@@ -344,7 +406,7 @@ def add_to_cart(patient_ID):
                 function redirect() {{
                     document.location.href = '/add_to_cart/{patient_ID}';
                 }}
-                setTimeout(redirect, 5000);
+                setTimeout(redirect, 3000);
             </script>
             '''
         
@@ -371,7 +433,7 @@ def add_to_cart(patient_ID):
                 function redirect() {{
                     document.location.href = '/add_to_cart/{patient_ID}';
                 }}
-                setTimeout(redirect, 5000);
+                setTimeout(redirect, 3000);
             </script>
             '''
 
@@ -407,7 +469,7 @@ def submit_cart(patient_ID):
             function redirect() {
                 document.location.href = 'add_to_cart/<patient_ID>';
             }
-            setTimeout(redirect, 5000);
+            setTimeout(redirect, 3000);
         </script>
         '''
 
@@ -447,7 +509,7 @@ def submit_cart(patient_ID):
             function redirect() {{
                 document.location.href = '/view_patient';
             }}
-            setTimeout(redirect, 5000);
+            setTimeout(redirect, 3000);
         </script>'''
 
 @app.route('/view_cart/<patient_ID>', methods=['GET', 'POST'])
@@ -483,7 +545,7 @@ def view_cart(patient_ID):
             function redirect() {{
                 document.location.href = '/view_cart/{patient_ID}';
             }}
-            setTimeout(redirect, 5000);
+            setTimeout(redirect, 3000);
         </script>
         '''
 
