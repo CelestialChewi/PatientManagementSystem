@@ -93,3 +93,12 @@ blockquote {
     text-align: center;
 }
 
+#submit_button {
+    float: right;
+}
+
+i {
+    font-size: 25px;
+    bottom: -5px;
+    position: relative;
+}

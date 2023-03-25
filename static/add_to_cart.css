@@ -150,16 +150,28 @@ a:hover{
 }
 
 form {
-    margin: 0 auto;
+    margin: auto;
     margin-top: 100px;
     margin-left: 50px;
     margin-bottom: 500px;
     background-color: azure;
     border: 1px solid black;
-    padding: 20px
+    padding: 30px;
+    height: 250px;
 }
 
 form button {
     float: left;
     margin: 15px
+}
+
+#quantity {
+    width: 181px;
+    display: flex
+}
+
+i {
+    font-size: 25px;
+    bottom: -5px;
+    position: relative;
 }

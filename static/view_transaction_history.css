@@ -98,3 +98,7 @@ i {
     bottom: -5px;
     position: relative;
 }
+
+#no_transaction_message {
+    font-weight: bold;
+}

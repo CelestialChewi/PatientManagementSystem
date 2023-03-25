@@ -1,0 +1,25 @@
+body {
+    text-align: center;
+    background-color: #FBFAF0;
+}
+
+h1 {
+    text-align: center;
+    padding: 50px
+}
+
+#add_patient {
+    margin-top: 50px;
+    padding: 20px;
+    width: 200px;
+    background-color: #D6FFBB;
+    border-width: 1px;
+}
+
+#view_patient {
+    margin-top: 100px;
+    padding: 20px;
+    width: 200px;
+    background-color: #C1FEF7;
+    border-width: 1px;
+}
