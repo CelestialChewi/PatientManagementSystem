@@ -4,19 +4,17 @@ import psycopg2
 
 
 app = Flask(__name__)
-conn = psycopg2.connect(database=" ",
-                        host=" ",
-                        user=" ",
-                        password=" ",
-                        port=" ")
+conn = psycopg2.connect(database="SA_Assessment",
+                        host="localhost",
+                        user="postgres",
+                        password="chewi1234",
+                        port="5432")
+
+# User homepage
 
 @app.route('/')
 def home():
     return render_template('homepage.html')
-
-@app.route('/admin_homepage')
-def admin_homepage():
-    return render_template('admin_homepage.html')
 
 @app.route('/view_patient', methods=['GET'])
 def view_patient():
@@ -395,6 +393,10 @@ def view_transaction_history(patient_ID):
 
 # Admin Homepage
 
+@app.route('/admin_homepage')
+def admin_homepage():
+    return render_template('admin_homepage.html')
+
 @app.route('/view_medicine', methods=['GET'])
 def view_medicine():
     cursor = conn.cursor()
@@ -462,7 +464,7 @@ def edit_medicine(medicine_ID):
     cursor.execute('''
         SELECT * 
             FROM public."Medicine" 
-            WHERE "medicine_ID" = %s''', (medicine_ID))
+            WHERE "medicine_ID" = %s''', (medicine_ID,))
     
     medicine = cursor.fetchone()
 
