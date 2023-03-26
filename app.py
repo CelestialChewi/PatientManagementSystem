@@ -4,11 +4,7 @@ import psycopg2
 
 
 app = Flask(__name__)
-conn = psycopg2.connect(database="",
-                        host="",
-                        user="",
-                        password="",
-                        port="")
+conn = psycopg2.connect
 
 @app.route('/')
 def home():
@@ -18,7 +14,7 @@ def home():
 def admin_homepage():
     return render_template('admin_homepage.html')
 
-@app.route('/view_patient', methods=['GET']) # View all patient's detail
+@app.route('/view_patient', methods=['GET'])
 def view_patient():
     cursor = conn.cursor()
     cursor.execute('''
@@ -34,11 +30,11 @@ def view_patient():
     
     return render_template("view_patient.html", patient_name=rows)
 
-@app.route('/add_patient', methods=['GET']) # Success
+@app.route('/add_patient', methods=['GET'])
 def show_add_patient_form():
     return render_template('add_patient.html')
 
-@app.route('/add_patient', methods=['POST']) # Success
+@app.route('/add_patient', methods=['POST'])
 def add_patient(): 
 
     # Get the patient's information from the form
@@ -102,7 +98,7 @@ def add_patient_allergy(patient_ID):
         Allergy ({allergen_name}) added successfully
         <script>
             function redirect() {{
-                document.location.href = '/add_allergy/{patient_ID}';
+                document.location.href = '/add_patient_allergy/{patient_ID}';
             }}
             setTimeout(redirect, 3000);
         </script>
@@ -160,196 +156,6 @@ def edit_patient(patient_ID):
         patient = cursor.fetchone()
 
         return render_template("edit_patient.html", patient=patient)
-
-@app.route('/view_medicine', methods=['GET'])
-def view_medicine():
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT ma.*, al."allergen_name", a."medicine_name"
-            FROM public."Medicine"a
-            JOIN public."MedicineAllergens"ma ON a."medicine_ID" = ma."medicine_ID"
-            JOIN public."Allergens"al ON al."allergen_ID" = ma."allergen_ID"
-            ORDER BY a."medicine_name" ASC
-        ''')
-    medicine_list = cursor.fetchall()
-    cursor.close()
-
-    return render_template('view_medicine.html', medicine_list=medicine_list)
-
-@app.route('/add_allergen', methods=['GET', 'POST'])
-def add_allergen():
-    if request.method == 'POST':
-        allergen_name = request.form.get('allergen_name')
-
-        # Check if the allergen already has in the database
-        cursor = conn.cursor()
-        cursor.execute('''
-            SELECT "allergen_name"
-                FROM public."Allergens"''')
-        existed_allergens = cursor.fetchall()[1]
-
-        if allergen_name in existed_allergens:
-            return f'''
-            {allergen_name} already has in the database
-            <script>
-                function redirect() {{
-                    document.location.href = 'add_allergen';
-                }}
-                setTimeout(redirect, 3000);
-            </script>
-            '''
-     
-        else:
-            # Insert the new allergen into the database
-            cursor = conn.cursor()
-            cursor.execute('''
-                INSERT INTO public."Allergens" ("allergen_name") 
-                VALUES (%s)''', (allergen_name,))
-            conn.commit()
-            cursor.close()
-            
-            return f'''
-            Successfully added allergen "{allergen_name}" to the database!
-            <script>
-                function redirect() {{
-                    document.location.href = 'add_allergen';
-                }}
-                setTimeout(redirect, 3000);
-            </script>
-            '''
-    
-    # If the request method is GET, render the template with the form
-    return render_template('add_allergen.html')
-
-@app.route('/edit_medicine/<medicine_ID>', methods=['GET', 'POST'])
-def edit_medicine(medicine_ID):
-    # Get the medicine details
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT * 
-            FROM public."Medicine" 
-            WHERE "medicine_ID" = %s''', (medicine_ID))
-    
-    medicine = cursor.fetchone()
-
-    if request.method == 'POST':
-        medicine_name = request.form['medicine_name']
-        allergen_name = request.form['allergen_name']
-
-        # Update the medicine name if it has been changed
-        if medicine_name != medicine_name[1]:
-            cursor.execute('''
-                UPDATE public."Medicine" SET "medicine_name" = %s 
-                WHERE "medicine_ID" = %s''', (medicine_name, medicine_ID))
-
-        # Get the allergen ID for the given allergen name
-        cursor.execute('''
-            SELECT ma.*, a."allergen_name"
-                FROM public."MedicineAllergens"ma
-                JOIN public."Allergens"a ON ma."allergen_ID" = a."allergen_ID"
-                WHERE a."allergen_name" = %s and ma."medicine_ID" = %s''', (allergen_name, medicine_ID))
-        allergen_ID = cursor.fetchone()[2]
-
-        # Check if the medicine-allergen relationship already exists
-        cursor.execute('''
-            SELECT * 
-                FROM public."MedicineAllergens" 
-                WHERE "medicine_ID" = %s AND "allergen_ID" = %s''', (medicine_ID, allergen_ID))
-        existing_relationship = cursor.fetchone()
-
-        # If the medicine-allergen relationship does not exist, insert the new relationship into the MedicineAllergy table
-        if not existing_relationship:
-            cursor.execute('''
-                INSERT INTO public."MedicineAllergens"("medicine_ID", "allergen_ID")
-                VALUES (%s, %s)''', (medicine_ID, allergen_ID))
-            conn.commit()
-
-        return f'''
-            Medicine updated successfully
-            <script>
-                function redirect() {{
-                    document.location.href = '/edit_medicine/{medicine_ID}';
-                }}
-                setTimeout(redirect, 3000);
-            </script>
-            '''
-
-    else:
-        # Get the list of allergens to display in the dropdown menu
-        cursor.execute('''
-            SELECT "allergen_name" 
-            FROM public."Allergens"
-            ''')
-        allergens = [allergen[0] for allergen in cursor.fetchall()]
-
-        return render_template('edit_medicine.html', medicine=medicine, allergens=allergens)
-
-@app.route('/add_medicine', methods=['GET', 'POST'])
-def add_medicine():
-    if request.method == 'POST':
-        medicine_name = request.form['medicine_name']
-        allergen_name = request.form['allergen_name']
-
-        # Get the existed medicine name that already exists
-        cursor = conn.cursor()
-        cursor.execute('''
-            SELECT "medicine_name"
-                FROM public."Medicine"''')
-        existed_medicine = cursor.fetchall()
-
-        # Check if the medicine name already existed in the public."Medicine"
-        if medicine_name not in existed_medicine:
-            cursor.execute('''
-                INSERT INTO public."Medicine"("medicine_name")
-                VALUES (%s) 
-                RETURNING "medicine_ID"''', (medicine_name,))
-            medicine_ID = cursor.fetchone()[0]
-
-            # Get the allergen_ID 
-            cursor.execute('''
-                SELECT "allergen_ID" 
-                    FROM public."Allergens" 
-                    WHERE "allergen_name" = %s''', (allergen_name,))
-            allergen_ID = cursor.fetchone()[0]
-
-            # Insert the new medicine-allergen relationship into the public."MedicineAllergens"
-            cursor.execute('''
-                INSERT INTO public."MedicineAllergens"("medicine_ID", "allergen_ID") 
-                VALUES (%s, %s)''', (medicine_ID, allergen_ID))
-            conn.commit()
-
-            return f'''
-            {medicine_name} has added in the database
-            <script>
-                function redirect() {{
-                    document.location.href = 'add_medicine';
-                }}
-                setTimeout(redirect, 3000);
-            </script>
-            '''
-
-        else:
-            return f'''
-            {medicine_name} already exist in the database
-            <script>
-                function redirect() {{
-                    document.location.href = 'add_medicine';
-                }}
-                setTimeout(redirect, 3000);
-            </script>
-            '''
-
-    else:
-        # Get the list of allergens to display in the dropdown menu
-        cursor = conn.cursor()
-        cursor.execute('''
-            SELECT "allergen_name" 
-            FROM public."Allergens"
-            ''')
-
-        allergens = [allergen[0] for allergen in cursor.fetchall()]
-
-        return render_template('add_medicine.html', allergens=allergens)
 
 @app.route('/add_to_cart/<patient_ID>', methods=['POST', 'GET'])
 def add_to_cart(patient_ID):
@@ -515,11 +321,11 @@ def submit_cart(patient_ID):
 def view_cart(patient_ID):
     cursor = conn.cursor()
     cursor.execute('''
-        SELECT v."patient_ID", v."medicine_ID", SUM (v."quantity"), m."medicine_name"	
+        SELECT v."patient_ID", v."medicine_ID", SUM(v."quantity"), m."medicine_name"	
             FROM public."ViewCart"v
             JOIN public."Medicine"m on v."medicine_ID" = m."medicine_ID"
             WHERE v."patient_ID" = %s
-            GROUP BY v."patient_ID", v."medicine_ID", m."medicine_name" ''', (patient_ID))
+            GROUP BY v."patient_ID", v."medicine_ID", m."medicine_name"''', (patient_ID))
     cart_items = cursor.fetchall()
     cursor.close()
 
@@ -530,6 +336,16 @@ def view_cart(patient_ID):
     patient_name = cursor.fetchone()[0]
     cursor.close()
 
+    if len(cart_items) == 0:
+        return f'''
+        Your cart item is empty
+        <script>
+            function redirect() {{
+                document.location.href = '/view_cart/{patient_ID}';
+            }}
+            setTimeout(redirect, 3000);
+        </script>
+        '''
     if request.method == 'POST':
         medicine_ID = request.form['medicine_ID']
         cursor = conn.cursor()
@@ -573,4 +389,194 @@ def view_transaction_history(patient_ID):
 
     return render_template('view_transaction_history.html', patient_ID=patient_ID, patient_name=patient_name, transaction_history=transaction_history)
 
+# Admin Homepage
 
+@app.route('/view_medicine', methods=['GET'])
+def view_medicine():
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT ma.*, al."allergen_name", a."medicine_name"
+            FROM public."Medicine"a
+            JOIN public."MedicineAllergens"ma ON a."medicine_ID" = ma."medicine_ID"
+            JOIN public."Allergens"al ON al."allergen_ID" = ma."allergen_ID"
+            ORDER BY a."medicine_name" ASC
+        ''')
+    medicine_list = cursor.fetchall()
+    cursor.close()
+
+    return render_template('view_medicine.html', medicine_list=medicine_list)
+
+@app.route('/add_allergen', methods=['GET', 'POST'])
+def add_allergen():
+    if request.method == 'POST':
+        allergen_name = request.form.get('allergen_name')
+
+        # Check if the allergen already has in the database
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT "allergen_name"
+                FROM public."Allergens"''')
+        existed_allergens = cursor.fetchall()[1]
+
+        if allergen_name in existed_allergens:
+            return f'''
+            {allergen_name} already has in the database
+            <script>
+                function redirect() {{
+                    document.location.href = 'add_allergen';
+                }}
+                setTimeout(redirect, 3000);
+            </script>
+            '''
+     
+        else:
+            # Insert the new allergen into the database
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO public."Allergens" ("allergen_name") 
+                VALUES (%s)''', (allergen_name,))
+            conn.commit()
+            cursor.close()
+            
+            return f'''
+            Successfully added allergen "{allergen_name}" to the database!
+            <script>
+                function redirect() {{
+                    document.location.href = 'add_allergen';
+                }}
+                setTimeout(redirect, 3000);
+            </script>
+            '''
+    
+    # If the request method is GET, render the template with the form
+    return render_template('add_allergen.html')
+
+@app.route('/edit_medicine/<medicine_ID>', methods=['GET', 'POST'])
+def edit_medicine(medicine_ID):
+    # Get the medicine details
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT * 
+            FROM public."Medicine" 
+            WHERE "medicine_ID" = %s''', (medicine_ID))
+    
+    medicine = cursor.fetchone()
+
+    if request.method == 'POST':
+        medicine_name = request.form['medicine_name']
+        allergen_name = request.form['allergen_name']
+
+        # Update the medicine name if it has been changed
+        if medicine_name != medicine_name[1]:
+            cursor.execute('''
+                UPDATE public."Medicine" SET "medicine_name" = %s 
+                WHERE "medicine_ID" = %s''', (medicine_name, medicine_ID))
+
+        # Get the allergen ID for the given allergen name
+        cursor.execute('''
+            SELECT ma.*, a."allergen_name"
+                FROM public."MedicineAllergens"ma
+                JOIN public."Allergens"a ON ma."allergen_ID" = a."allergen_ID"
+                WHERE a."allergen_name" = %s and ma."medicine_ID" = %s''', (allergen_name, medicine_ID))
+        allergen_ID = cursor.fetchone()[2]
+
+        # Check if the medicine-allergen relationship already exists
+        cursor.execute('''
+            SELECT * 
+                FROM public."MedicineAllergens" 
+                WHERE "medicine_ID" = %s AND "allergen_ID" = %s''', (medicine_ID, allergen_ID))
+        existing_relationship = cursor.fetchone()
+
+        # If the medicine-allergen relationship does not exist, insert the new relationship into the MedicineAllergy table
+        if not existing_relationship:
+            cursor.execute('''
+                INSERT INTO public."MedicineAllergens"("medicine_ID", "allergen_ID")
+                VALUES (%s, %s)''', (medicine_ID, allergen_ID))
+            conn.commit()
+
+        return f'''
+            Medicine updated successfully
+            <script>
+                function redirect() {{
+                    document.location.href = '/edit_medicine/{medicine_ID}';
+                }}
+                setTimeout(redirect, 3000);
+            </script>
+            '''
+
+    else:
+        # Get the list of allergens to display in the dropdown menu
+        cursor.execute('''
+            SELECT "allergen_name" 
+            FROM public."Allergens"
+            ''')
+        allergens = [allergen[0] for allergen in cursor.fetchall()]
+
+        return render_template('edit_medicine.html', medicine=medicine, allergens=allergens)
+
+@app.route('/add_medicine', methods=['GET', 'POST'])
+def add_medicine():
+    if request.method == 'POST':
+        medicine_name = request.form['medicine_name']
+        allergen_name = request.form['allergen_name']
+
+        # Get the existed medicine name that already exists
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT "medicine_name"
+                FROM public."Medicine"''')
+        existed_medicine = [row[0] for row in cursor.fetchall()]
+
+        # Check if the medicine name already existed in the public."Medicine"
+        if medicine_name not in existed_medicine:
+            cursor.execute('''
+                INSERT INTO public."Medicine"("medicine_name")
+                VALUES (%s) 
+                RETURNING "medicine_ID"''', (medicine_name,))
+            medicine_ID = cursor.fetchone()[0]
+
+            # Get the allergen_ID 
+            cursor.execute('''
+                SELECT "allergen_ID" 
+                    FROM public."Allergens" 
+                    WHERE "allergen_name" = %s''', (allergen_name,))
+            allergen_ID = cursor.fetchone()[0]
+
+            # Insert the new medicine-allergen relationship into the public."MedicineAllergens"
+            cursor.execute('''
+                INSERT INTO public."MedicineAllergens"("medicine_ID", "allergen_ID") 
+                VALUES (%s, %s)''', (medicine_ID, allergen_ID))
+            conn.commit()
+
+            return f'''
+            {medicine_name} has added in the database
+            <script>
+                function redirect() {{
+                    document.location.href = 'add_medicine';
+                }}
+                setTimeout(redirect, 3000);
+            </script>
+            '''
+
+        else:
+            return f'''
+            {medicine_name} already exist in the database
+            <script>
+                function redirect() {{
+                    document.location.href = 'add_medicine';
+                }}
+                setTimeout(redirect, 3000);
+            </script>
+            '''
+
+    else:
+        # Get the list of allergens to display in the dropdown menu
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT "allergen_name" 
+            FROM public."Allergens"
+            ''')
+
+        allergens = [allergen[0] for allergen in cursor.fetchall()]
+
+        return render_template('add_medicine.html', allergens=allergens)
