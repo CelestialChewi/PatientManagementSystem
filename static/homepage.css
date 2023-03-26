@@ -23,3 +23,8 @@ h1 {
     background-color: #C1FEF7;
     border-width: 1px;
 }
+
+#admin_homepage {
+    float: left;
+    margin-top: 110px;
+}
