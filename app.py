@@ -4,7 +4,11 @@ import psycopg2
 
 
 app = Flask(__name__)
-conn = psycopg2.connect
+conn = psycopg2.connect(database=" ",
+                        host=" ",
+                        user=" ",
+                        password=" ",
+                        port=" ")
 
 @app.route('/')
 def home():
@@ -233,7 +237,7 @@ def add_to_cart(patient_ID):
 
             # Return a success message
             return f'''
-            Medicine added to cart successfully
+            {medicine_name} (quantity: {quantity}) added to cart successfully
             <script>
                 function redirect() {{
                     document.location.href = '/add_to_cart/{patient_ID}';
@@ -325,7 +329,7 @@ def view_cart(patient_ID):
             FROM public."ViewCart"v
             JOIN public."Medicine"m on v."medicine_ID" = m."medicine_ID"
             WHERE v."patient_ID" = %s
-            GROUP BY v."patient_ID", v."medicine_ID", m."medicine_name"''', (patient_ID))
+            GROUP BY v."patient_ID", v."medicine_ID", m."medicine_name"''', (patient_ID,))
     cart_items = cursor.fetchall()
     cursor.close()
 
@@ -341,7 +345,7 @@ def view_cart(patient_ID):
         Your cart item is empty
         <script>
             function redirect() {{
-                document.location.href = '/view_cart/{patient_ID}';
+                document.location.href = '/add_to_cart/{patient_ID}';
             }}
             setTimeout(redirect, 3000);
         </script>
@@ -383,7 +387,7 @@ def view_transaction_history(patient_ID):
             JOIN public."Medicine" m ON th."medicine_ID" = m."medicine_ID"
             WHERE th."patient_ID" = %s
             GROUP BY m."medicine_ID", th."purchase_date"
-            ORDER BY th."purchase_date" DESC''', (patient_ID))
+            ORDER BY th."purchase_date" DESC''', (patient_ID,))
     transaction_history = cursor.fetchall()
     cursor.close()
 
