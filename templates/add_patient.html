@@ -17,13 +17,13 @@
       </a>
     </h1>
     <form method="POST" action="{{ url_for('add_patient') }}">
-      <input type="text" id="patient_name" name="patient_name" placeholder="Name"><br>
+      <input type="text" id="patient_name" name="patient_name" placeholder="Name" required><br>
 
-      <input type="text" id="patient_IC" name="patient_IC" placeholder="IC (without -)"><br>
+      <input type="text" id="patient_IC" name="patient_IC" placeholder="IC (without -)" required><br>
 
       <input type="text" id="patient_passport" name="patient_passport" placeholder="Passport"><br>
 
-      <input type="date" id="patient_DOB" name="patient_DOB" placeholder="Date of Birth"><br>
+      <input type="date" id="patient_DOB" name="patient_DOB" placeholder="Date of Birth" required><br>
 
       <input type="submit" id="add_patient" value="Add Patient">
     </form>

@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='/edit_medicine.css') }}"/>
+    <link 
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
     <title>Edit Medicine</title>
 </head>
 <body>
-    <h1>Edit Medicine</h1>
-
+    <h1>
+        Edit Medicine
+        <a href="/view_medicine">
+			<i class="material-icons" style="font-size:25px">people</i>
+		</a>
+    </h1>
     <form method="POST">
         <label for="medicine_name">Medicine Name:</label>
         <input type="text" id="medicine_name" name="medicine_name" value="{{ medicine[1] }}" required><br><br>
@@ -17,7 +28,7 @@
             {% endfor %}
         </select><br><br>
 
-        <input type="submit" value="Save Changes">
+        <button type="submit" id="save_button" value="Save Changes">Save Changes</button>
     </form>
 </body>
 </html>

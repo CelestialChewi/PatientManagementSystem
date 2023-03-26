@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='/admin_homepage.css') }}"/>
+    <title>Admin Homepage</title>
+  </head>
+  <body>
+    <h1>Admin Homepage</h1>
+    <button type="button" id="add_allergen" onclick="location.href='/add_allergen'">Add Allergens</button>
+    <br>
+    <button type="button" id="add_medicine" onclick="location.href='/add_medicine'">Add Medicine</button>
+    <br>
+    <button type="button" id="view_medicine" onclick="location.href='/view_medicine'">View Medicine List</button>
+    <br>
+    <button type="button" id="homepage" onclick="location.href='/'">Back to Homepage</button>
+  </body>
+</html>

@@ -1,12 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link
+	rel="stylesheet"
+	href="{{ url_for('static', filename='/add_medicine.css') }}"/>
+    <link 
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
     <title>Add Medicine</title>
 </head>
 <body>
-    <h1>Add Medicine</h1>
+    <h1>
+        Add Medicine
+        <a href="/view_medicine">
+			<i class="material-icons" style="font-size:25px">people</i>
+		</a>
+    </h1>
     <form method="post">
-        <label for="medicine_name">Medicine Name:</label>
+        <label for="medicine_name" id="medicine_label">Medicine Name:</label>
         <input type="text" id="medicine_name" name="medicine_name" required>
         <br>
         <label for="allergen_name">Allergen:</label>
@@ -16,7 +28,7 @@
             {% endfor %}
         </select>
         <br>
-        <button type="submit">Add Medicine</button>
+        <button type="submit" id="add_medicine_button">Add Medicine</button>
     </form>
 </body>
 </html>

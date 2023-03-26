@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='/add_patient_allergy.css') }}"/>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <title>Add Allergy</title>
+  </head>
+  <body>
+    <h1>
+      Add Allergy for {{ patient_name }}
+      <a href="/view_patient">
+        <i class="material-icons" style="font-size:25px">people</i>
+      </a>
+    </h1>
+    <form method="post" action="{{ url_for('add_patient_allergy', patient_ID=patient_ID) }}">
+      <label for="allergen_name">Allergen:</label>
+      <select name="allergen_name" id="allergen_name">
+        {% for allergen in allergens %}
+        <option value="{{ allergen }}">{{ allergen }}</option>
+        {% endfor %}
+      </select>
+      <br><br>
+      <button type="submit" id="add_button" value="Add Allergy">Add Allergy </button>
+    </form>
+  </body>
+</html>
