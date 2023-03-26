@@ -95,6 +95,16 @@ blockquote {
 
 #submit_button {
     float: right;
+    padding: 1vh;
+    margin-right: 16.5vw;
+    margin-top: 40px;
+}
+
+#back_cart_button {
+    float: left;
+    padding: 1vh;
+    margin-left: 16.5vw;
+    margin-top: 40px;
 }
 
 i {
